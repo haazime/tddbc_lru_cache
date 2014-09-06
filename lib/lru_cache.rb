@@ -19,4 +19,8 @@ class LRUCache
     @stored_key_order << key
     @container[key]
   end
+
+  def to_hash
+    @container
+  end
 end

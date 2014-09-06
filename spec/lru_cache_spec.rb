@@ -8,8 +8,10 @@ RSpec.describe LRUCache do
       cache[:a] = 'alpha'
       cache[:b] = 'bravo'
       cache[:c] = 'charlie'
-
-      expect(cache[:a]).to be_nil
+      expect(cache.to_hash).to match(
+        b: 'bravo',
+        c: 'charlie',
+      )
     end
 
     it ':bが消える' do
@@ -17,8 +19,10 @@ RSpec.describe LRUCache do
       cache[:b] = 'bravo'
       cache[:a]
       cache[:c] = 'charlie'
-
-      expect(cache[:b]).to be_nil
+      expect(cache.to_hash).to match(
+        a: 'alpha',
+        c: 'charlie',
+      )
     end
 
     it ':aが消える' do
@@ -27,8 +31,10 @@ RSpec.describe LRUCache do
       cache[:a]
       cache[:b]
       cache[:c] = 'charlie'
-
-      expect(cache[:a]).to be_nil
+      expect(cache.to_hash).to match(
+        b: 'bravo',
+        c: 'charlie',
+      )
     end
   end
 end
