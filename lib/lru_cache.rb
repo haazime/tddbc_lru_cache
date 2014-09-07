@@ -15,8 +15,7 @@ class LRUCache
   end
 
   def [](key)
-    @delete_key_order.delete(key)
-    @delete_key_order << key
+    @delete_key_order.tap {|x| x.delete(key) } << key
     @container[key]
   end
 
