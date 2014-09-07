@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe LRUCache, 'サイズを固定' do
   let(:cache) { LRUCache.new(2) }
 
