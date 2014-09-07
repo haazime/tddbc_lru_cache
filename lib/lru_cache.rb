@@ -9,9 +9,7 @@ class LRUCache
   def []=(key, value)
     @container[key] = value
     @delete_key_order << key
-    if @delete_key_order.size > @capacity
-      @container.delete(@delete_key_order.shift)
-    end
+    shape_container(@capacity)
   end
 
   def [](key)
@@ -20,13 +18,19 @@ class LRUCache
   end
 
   def resize(new_capacity)
-    return if @capacity <= new_capacity
-    @delete_key_order.take(@capacity - new_capacity).each do |key|
-      @container.delete(key)
-    end
+    shape_container(new_capacity)
   end
 
   def to_hash
     @container
+  end
+
+private
+
+  def shape_container(capacity)
+    return if @container.size <= capacity
+    @delete_key_order.take(@container.size - capacity).each do |key|
+      @container.delete(key)
+    end
   end
 end
