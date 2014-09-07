@@ -9,8 +9,9 @@ class LRUCache
   def []=(key, value)
     @container[key] = value
     @contained_key_order << key
-    @contained_key_order.shift if @capacity < @container.size
-    shape_container
+    if @capacity < @container.size
+      shape_container(reduce_contained_keys(1))
+    end
   end
 
   def [](key)
@@ -22,8 +23,7 @@ class LRUCache
     delta = @capacity - new_capacity
     @capacity = new_capacity
     return if delta < 0
-    @contained_key_order.slice!(0, delta)
-    shape_container
+    shape_container(reduce_contained_keys(delta))
   end
 
   def to_hash
@@ -32,8 +32,15 @@ class LRUCache
 
 private
 
-  def shape_container
-    (@container.keys - @contained_key_order).each do |key|
+  def reduce_contained_keys(num)
+    @contained_key_order.slice!(0, num)
+  end
+
+  def shape_container(keep_keys=nil)
+    if keep_keys.nil?
+      keep_keys = @container.keys - @contained_key_order
+    end
+    keep_keys.each do |key|
       @container.delete(key)
     end
   end
