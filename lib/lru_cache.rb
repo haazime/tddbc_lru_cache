@@ -20,6 +20,7 @@ class LRUCache
   end
 
   def resize(size)
+    return if @capacity <= size
     @delete_key_order.take(@capacity - size).each do |key|
       @container.delete(key)
     end

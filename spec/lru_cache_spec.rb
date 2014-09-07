@@ -55,7 +55,7 @@ RSpec.describe LRUCache, 'サイズを固定' do
   end
 end
 
-RSpec.describe LRUCache, 'サイズを後で変更' do
+RSpec.describe LRUCache, 'サイズを5から2に変更' do
   let(:cache) { LRUCache.new(5) }
 
   before do
@@ -82,6 +82,27 @@ RSpec.describe LRUCache, 'サイズを後で変更' do
     expect(cache.to_hash).to match(
       c: 'charlie',
       e: 'echo'
+    )
+  end
+end
+
+RSpec.describe LRUCache, 'サイズを3から5に変更' do
+  let(:cache) { LRUCache.new(3) }
+
+  before do
+    cache[:x] = 'x-ray'
+    cache[:y] = 'yankee'
+    cache[:z] = 'zulu'
+  end
+
+  it '何も消えない' do
+    cache[:z]
+    cache[:x]
+    cache.resize(5)
+    expect(cache.to_hash).to match(
+      x: 'x-ray',
+      y: 'yankee',
+      z: 'zulu'
     )
   end
 end
