@@ -19,6 +19,12 @@ class LRUCache
     @container[key]
   end
 
+  def resize(size)
+    @delete_key_order.take(@capacity - size).each do |key|
+      @container.delete(key)
+    end
+  end
+
   def to_hash
     @container
   end

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe LRUCache, 'サイズ2で生成' do
+RSpec.describe LRUCache, 'サイズを固定' do
   let(:cache) { LRUCache.new(2) }
 
   it '何も消えない' do
@@ -53,6 +53,37 @@ RSpec.describe LRUCache, 'サイズ2で生成' do
     expect(cache.to_hash).to match(
       b: 'bravo',
       c: 'charlie',
+    )
+  end
+end
+
+RSpec.describe LRUCache, 'サイズを後で変更' do
+  let(:cache) { LRUCache.new(5) }
+
+  before do
+    cache[:a] = 'alpha'
+    cache[:b] = 'bravo'
+    cache[:c] = 'charlie'
+    cache[:d] = 'delta'
+    cache[:e] = 'echo'
+  end
+
+  it ':a,:b,:cが消える' do
+    cache.resize(2)
+    expect(cache.to_hash).to match(
+      d: 'delta',
+      e: 'echo',
+    )
+  end
+
+  it ':a,:b,:dが消える' do
+    cache[:a]
+    cache[:c]
+    cache[:e]
+    cache.resize(2)
+    expect(cache.to_hash).to match(
+      c: 'charlie',
+      e: 'echo'
     )
   end
 end
