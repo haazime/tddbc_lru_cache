@@ -36,12 +36,7 @@ private
     @contained_key_order.slice!(0, num)
   end
 
-  def shape_container(keep_keys=nil)
-    if keep_keys.nil?
-      keep_keys = @container.keys - @contained_key_order
-    end
-    keep_keys.each do |key|
-      @container.delete(key)
-    end
+  def shape_container(keep_keys)
+    keep_keys.each {|key| @container.delete(key) }
   end
 end
