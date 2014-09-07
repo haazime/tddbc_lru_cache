@@ -3,18 +3,18 @@ class LRUCache
   def initialize(capacity)
     @capacity = capacity
     @container = {}
-    @contained_keys = []
+    @contained_key_order = []
   end
 
   def []=(key, value)
     @container[key] = value
-    @contained_keys << key
-    @contained_keys.shift if @capacity < @contained_keys.size
+    @contained_key_order << key
+    @contained_key_order.shift if @capacity < @container.size
     shape_container
   end
 
   def [](key)
-    @contained_keys.tap {|x| x.delete(key) } << key
+    @contained_key_order.tap {|x| x.delete(key) } << key
     @container[key]
   end
 
@@ -22,7 +22,7 @@ class LRUCache
     delta = @capacity - new_capacity
     @capacity = new_capacity
     return if delta < 0
-    @contained_keys.slice!(0, delta)
+    @contained_key_order.slice!(0, delta)
     shape_container
   end
 
@@ -33,7 +33,7 @@ class LRUCache
 private
 
   def shape_container
-    (@container.keys - @contained_keys).each do |key|
+    (@container.keys - @contained_key_order).each do |key|
       @container.delete(key)
     end
   end
