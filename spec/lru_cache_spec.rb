@@ -84,6 +84,18 @@ RSpec.describe LRUCache, 'サイズを5から2に変更' do
       e: 'echo'
     )
   end
+
+  it ':a,:b,:d,:cが消える' do
+    cache[:a]
+    cache[:c]
+    cache[:e]
+    cache.resize(2)
+    cache[:f] = 'foxtrot'
+    expect(cache.to_hash).to match(
+      e: 'echo',
+      f: 'foxtrot'
+    )
+  end
 end
 
 RSpec.describe LRUCache, 'サイズを3から5に変更' do
