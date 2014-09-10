@@ -1,22 +1,25 @@
 class LRUCache
 
   def initialize(capacity)
-    @history = History.new(capacity)
+    @capacity = capacity
+    @history = History.new
     @container = {}
   end
 
   def []=(key, value)
     @container[@history.record(key)] = value
-    shape_container(@history.to_a)
+    shape_container(@history.keys(@capacity))
   end
 
   def [](key)
     @container[@history.record(key)]
   end
 
-  def resize(capacity)
-    @history.resize(capacity)
-    shape_container(@history.to_a)
+  def resize(new_capacity)
+    if new_capacity < @capacity
+      shape_container(@history.keys(new_capacity))
+    end
+    @capacity = new_capacity
   end
 
   def to_hash
@@ -31,25 +34,17 @@ private
 
   class History
 
-    def initialize(capacity)
-      @capacity = capacity
+    def initialize
       @keys = []
     end
 
     def record(key)
       @keys.tap {|x| x.delete(key) } << key
-      resize(@capacity)
       key
     end
 
-    def resize(new_capacity)
-      @capacity = new_capacity
-      return self unless (delta = @keys.size - new_capacity) > 0
-      @keys.slice!(0, delta)
-    end
-
-    def to_a
-      @keys
+    def keys(capacity)
+      @keys.tap {|x| x.slice!(0, x.size - capacity) }
     end
   end
 end
