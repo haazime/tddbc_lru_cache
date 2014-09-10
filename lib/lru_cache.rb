@@ -1,29 +1,22 @@
 class LRUCache
 
   def initialize(capacity)
-    @capacity = capacity
+    @history = History.new(capacity)
     @container = {}
-    @contained_key_order = []
   end
 
   def []=(key, value)
-    @container[key] = value
-    @contained_key_order << key
-    if @capacity < @container.size
-      shape_container(reduce_contained_keys(1))
-    end
+    @container[@history.record(key)] = value
+    shape_container(@history.to_a)
   end
 
   def [](key)
-    @contained_key_order.tap {|x| x.delete(key) } << key
-    @container[key]
+    @container[@history.record(key)]
   end
 
-  def resize(new_capacity)
-    delta = @capacity - new_capacity
-    @capacity = new_capacity
-    return if delta < 0
-    shape_container(reduce_contained_keys(delta))
+  def resize(capacity)
+    @history.resize(capacity)
+    shape_container(@history.to_a)
   end
 
   def to_hash
@@ -32,11 +25,31 @@ class LRUCache
 
 private
 
-  def reduce_contained_keys(num)
-    @contained_key_order.slice!(0, num)
+  def shape_container(keys)
+    (@container.keys - keys).each {|k| @container.delete(k) }
   end
 
-  def shape_container(keep_keys)
-    keep_keys.each {|key| @container.delete(key) }
+  class History
+
+    def initialize(capacity)
+      @capacity = capacity
+      @keys = []
+    end
+
+    def record(key)
+      @keys.tap {|x| x.delete(key) } << key
+      resize(@capacity)
+      key
+    end
+
+    def resize(new_capacity)
+      @capacity = new_capacity
+      return self unless (delta = @keys.size - new_capacity) > 0
+      @keys.slice!(0, delta)
+    end
+
+    def to_a
+      @keys
+    end
   end
 end

@@ -1,6 +1,10 @@
 RSpec.describe LRUCache, 'サイズを固定' do
   let(:cache) { LRUCache.new(2) }
 
+  it '存在しないキーで取り出すとnilが返る' do
+    expect(cache[:a]).to be_nil
+  end
+
   it '何も消えない' do
     expect(cache.to_hash).to match({})
   end
