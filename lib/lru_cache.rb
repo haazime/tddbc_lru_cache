@@ -6,12 +6,12 @@ class LRUCache
     @container = {}
   end
 
-  def []=(key, value)
+  def put(key, value)
     @container[@history.record(key)] = value
     shape_container(@history.keys(@capacity))
   end
 
-  def [](key)
+  def get(key)
     @container[@history.record(key)]
   end
 
