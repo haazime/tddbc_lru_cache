@@ -123,10 +123,28 @@ RSpec.describe LRUCache, 'サイズを3から5に変更' do
   end
 end
 
-#RSpec.describe LRUCache, 'タイムアウトを60秒に設定' do
-#  let(:cache) { LRUCache.new(2, timeout: 60) }
-#
-#  it '61秒経ったデータは消える' do
-#    cache.get(:a, 'alpha')
-#  end
-#end
+RSpec.describe LRUCache, 'タイムアウトを60秒に設定' do
+  let(:cache) { LRUCache.new(2, timeout: 60) }
+
+  it '60秒以上経ったデータは消える' do
+    stub_now(Time.now - 60) do
+      cache.put(:a, 'alpha')
+    end
+    cache.put(:b, 'bravo')
+    expect(cache.get(:a)).to be_nil
+    expect(cache.get(:b)).to eq('bravo')
+  end
+
+  it '60秒経っていないデータは残る' do
+    freezed_now = Time.now
+    stub_now(freezed_now - 59) do
+      cache.put(:x, 'x-ray')
+      cache.put(:y, 'yankee')
+      cache.put(:z, 'zulu')
+    end
+    stub_now(freezed_now) do
+      expect(cache.get(:y)).to eq('yankee')
+      expect(cache.get(:z)).to eq('zulu')
+    end
+  end
+end
