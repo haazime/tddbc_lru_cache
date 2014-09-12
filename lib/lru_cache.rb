@@ -14,7 +14,7 @@ class LRUCache
 
   def get(key)
     if @timeout
-      @history.cleanup(Time.now - @timeout)
+      @history.timeout(Time.now - @timeout)
       shape_container(@history.keys(@capacity))
     end
     @container[@history.record(key)]
@@ -64,7 +64,7 @@ private
       @lines.map {|l| l.key }
     end
 
-    def cleanup(expire_at)
+    def timeout(expire_at)
       @lines.reject! {|l| l.expired?(expire_at) }
     end
   end
