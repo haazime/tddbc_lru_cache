@@ -136,14 +136,13 @@ RSpec.describe LRUCache, 'タイムアウトを60秒に設定' do
   end
 
   it '60秒経っていないデータは残る' do
-    freezed_now = Time.now
-    stub_now(freezed_now - 59) do
+    stub_now(Time.now - 59) do
       cache.put(:x, 'x-ray')
       cache.put(:y, 'yankee')
+      cache.get(:x)
       cache.put(:z, 'zulu')
-    end
-    stub_now(freezed_now) do
-      expect(cache.get(:y)).to eq('yankee')
+      expect(cache.get(:x)).to eq('x-ray')
+      expect(cache.get(:y)).to be_nil
       expect(cache.get(:z)).to eq('zulu')
     end
   end
