@@ -2,7 +2,7 @@ RSpec.describe LRUCache, 'サイズを固定' do
   let(:cache) { LRUCache.new(2) }
 
   it '存在しないキーで取り出すとnilが返る' do
-    expect(cache.get(:a)).to be_nil
+    expect(cache[:a]).to be_nil
   end
 
   it '何も消えない' do
@@ -10,15 +10,15 @@ RSpec.describe LRUCache, 'サイズを固定' do
   end
 
   it '何も消えない' do
-    cache.put(:a, 'alpha')
+    cache[:a] = 'alpha'
     expect(cache.to_hash).to match(
       a: 'alpha'
     )
   end
 
   it '何も消えない' do
-    cache.put(:a, 'alpha')
-    cache.put(:b, 'bravo')
+    cache[:a] = 'alpha'
+    cache[:b] = 'bravo'
     expect(cache.to_hash).to match(
       a: 'alpha',
       b: 'bravo',
@@ -26,9 +26,9 @@ RSpec.describe LRUCache, 'サイズを固定' do
   end
 
   it ':aが消える' do
-    cache.put(:a, 'alpha')
-    cache.put(:b, 'bravo')
-    cache.put(:c, 'charlie')
+    cache[:a] = 'alpha'
+    cache[:b] = 'bravo'
+    cache[:c] = 'charlie'
     expect(cache.to_hash).to match(
       b: 'bravo',
       c: 'charlie',
@@ -36,10 +36,10 @@ RSpec.describe LRUCache, 'サイズを固定' do
   end
 
   it ':bが消える' do
-    cache.put(:a, 'alpha')
-    cache.put(:b, 'bravo')
-    cache.get(:a)
-    cache.put(:c, 'charlie')
+    cache[:a] = 'alpha'
+    cache[:b] = 'bravo'
+    cache[:a]
+    cache[:c] = 'charlie'
     expect(cache.to_hash).to match(
       a: 'alpha',
       c: 'charlie',
@@ -47,11 +47,11 @@ RSpec.describe LRUCache, 'サイズを固定' do
   end
 
   it ':aが消える' do
-    cache.put(:a, 'alpha')
-    cache.put(:b, 'bravo')
-    cache.get(:a)
-    cache.get(:b)
-    cache.put(:c, 'charlie')
+    cache[:a] = 'alpha'
+    cache[:b] = 'bravo'
+    cache[:a]
+    cache[:b]
+    cache[:c] = 'charlie'
     expect(cache.to_hash).to match(
       b: 'bravo',
       c: 'charlie',
@@ -63,11 +63,11 @@ RSpec.describe LRUCache, 'サイズを5から2に変更' do
   let(:cache) { LRUCache.new(5) }
 
   before do
-    cache.put(:a, 'alpha')
-    cache.put(:b, 'bravo')
-    cache.put(:c, 'charlie')
-    cache.put(:d, 'delta')
-    cache.put(:e, 'echo')
+    cache[:a] = 'alpha'
+    cache[:b] = 'bravo'
+    cache[:c] = 'charlie'
+    cache[:d] = 'delta'
+    cache[:e] = 'echo'
   end
 
   it ':a,:b,:cが消える' do
@@ -79,9 +79,9 @@ RSpec.describe LRUCache, 'サイズを5から2に変更' do
   end
 
   it ':a,:b,:dが消える' do
-    cache.get(:a)
-    cache.get(:c)
-    cache.get(:e)
+    cache[:a]
+    cache[:c]
+    cache[:e]
     cache.resize(2)
     expect(cache.to_hash).to match(
       c: 'charlie',
@@ -90,11 +90,11 @@ RSpec.describe LRUCache, 'サイズを5から2に変更' do
   end
 
   it ':a,:b,:d,:cが消える' do
-    cache.get(:a)
-    cache.get(:c)
-    cache.get(:e)
+    cache[:a]
+    cache[:c]
+    cache[:e]
     cache.resize(2)
-    cache.put(:f, 'foxtrot')
+    cache[:f] = 'foxtrot'
     expect(cache.to_hash).to match(
       e: 'echo',
       f: 'foxtrot'
@@ -106,14 +106,14 @@ RSpec.describe LRUCache, 'サイズを3から5に変更' do
   let(:cache) { LRUCache.new(3) }
 
   before do
-    cache.put(:x, 'x-ray')
-    cache.put(:y, 'yankee')
-    cache.put(:z, 'zulu')
+    cache[:x] = 'x-ray'
+    cache[:y] = 'yankee'
+    cache[:z] = 'zulu'
   end
 
   it '何も消えない' do
-    cache.get(:z)
-    cache.get(:x)
+    cache[:z]
+    cache[:x]
     cache.resize(5)
     expect(cache.to_hash).to match(
       x: 'x-ray',
@@ -128,22 +128,22 @@ RSpec.describe LRUCache, 'タイムアウトを60秒に設定' do
 
   it '60秒以上経ったデータは消える' do
     stub_now(Time.now - 60) do
-      cache.put(:a, 'alpha')
+      cache[:a] = 'alpha'
     end
-    cache.put(:b, 'bravo')
-    expect(cache.get(:a)).to be_nil
-    expect(cache.get(:b)).to eq('bravo')
+    cache[:b] = 'bravo'
+    expect(cache[:a]).to be_nil
+    expect(cache[:b]).to eq('bravo')
   end
 
   it '60秒経っていないデータは残る' do
     stub_now(Time.now - 59) do
-      cache.put(:x, 'x-ray')
-      cache.put(:y, 'yankee')
-      cache.get(:x)
-      cache.put(:z, 'zulu')
-      expect(cache.get(:x)).to eq('x-ray')
-      expect(cache.get(:y)).to be_nil
-      expect(cache.get(:z)).to eq('zulu')
+      cache[:x] = 'x-ray'
+      cache[:y] = 'yankee'
+      cache[:x]
+      cache[:z] = 'zulu'
+      expect(cache[:x]).to eq('x-ray')
+      expect(cache[:y]).to be_nil
+      expect(cache[:z]).to eq('zulu')
     end
   end
 end

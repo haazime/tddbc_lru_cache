@@ -6,12 +6,12 @@ class LRUCache
     @container = {}
   end
 
-  def put(key, value)
+  def []=(key, value)
     @container[@history.record(key)] = value
     shape_container(@history.keys(@capacity))
   end
 
-  def get(key)
+  def [](key)
     @container[@history.record(key)].tap do |value|
       shape_container(@history.keys(@capacity)) if value
     end
