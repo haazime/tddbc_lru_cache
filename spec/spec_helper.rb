@@ -87,3 +87,9 @@ RSpec.configure do |config|
   # as the one that triggered the failure.
   Kernel.srand config.seed
 end
+
+def stub_now(fake_time)
+  allow(Time).to receive(:now) { fake_time }
+  yield
+  allow(Time).to receive(:now).and_call_original
+end

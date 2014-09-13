@@ -1,8 +1,8 @@
 class LRUCache
 
-  def initialize(capacity)
+  def initialize(capacity, options={})
     @capacity = capacity
-    @history = History.new
+    @history = History.new(options[:timeout])
     @container = {}
   end
 
@@ -12,7 +12,9 @@ class LRUCache
   end
 
   def [](key)
-    @container[@history.record(key)]
+    @container[@history.record(key)].tap do |value|
+      shape_container(@history.keys(@capacity)) if value
+    end
   end
 
   def resize(new_capacity)
@@ -33,18 +35,40 @@ private
   end
 
   class History
+    class Line < Struct.new(:key)
 
-    def initialize
-      @keys = []
+      def initialize(key)
+        super(key)
+        @created_at = Time.now
+      end
+
+      def expired?(expire_at)
+        @created_at <= expire_at
+      end
+    end
+
+    def initialize(timeout)
+      @lines = []
+      @timeout = timeout
     end
 
     def record(key)
-      @keys.tap {|x| x.delete(key) } << key
-      key
+      line = Line.new(key)
+      @lines.tap {|x| x.delete(line) } << line
+      line.key
     end
 
     def keys(capacity)
-      @keys.tap {|x| x.slice!(0, x.size - capacity) }
+      @lines.slice!(0, @lines.size - capacity)
+      timeout
+      @lines.map {|l| l.key }
+    end
+
+  private
+
+    def timeout
+      return unless @timeout
+      @lines.reject! {|l| l.expired?(Time.now - @timeout) }
     end
   end
 end
