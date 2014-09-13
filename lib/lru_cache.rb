@@ -12,9 +12,9 @@ class LRUCache
   end
 
   def [](key)
-    @container[@history.record(key)].tap do |value|
-      shape_container(@history.keys(@capacity)) if value
-    end
+    return nil unless @container.has_key?(key)
+    shape_container(@history.keys(@capacity))
+    @container[@history.record(key)]
   end
 
   def resize(new_capacity)
